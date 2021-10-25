@@ -12,15 +12,22 @@ export const Output = props => {
     setPedals([...pedals, pedal]);
   }
 
+  function onPedalUpdate(index, event, $pedal) {
+    const newPedals = [...pedals];
+    newPedals[index] = $pedal
+
+    setPedals(newPedals);
+  }
+
   return (
     <section>
       <header>
         <VoltageSwitch voltages={props.voltage} sag={props.sag} defaultValue={voltage} onChange={event => setVoltage(event.target.value)} />
         <AmperageMeter voltage={voltage} pedals={pedals} mah={props.mah} />
       </header>
-      {pedals.map((pedal, index) => <Pedal key={index} {...pedal} />)}
+      {pedals.map((pedal, index) => <Pedal key={index} {...pedal} onChange={(event, pedal) => onPedalUpdate(index, event, pedal)}/>)}
       <footer>
-        <PedalSelect onSubmit={onPedalSelect} />
+        <PedalSelect onSubmit={onPedalSelect} voltage={voltage} />
       </footer>
     </section>
   )

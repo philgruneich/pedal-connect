@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { DatalistSelect } from '~/components/DatalistSelect';
 import Pedals from './pedals';
 
@@ -8,8 +8,12 @@ const mappedPedals = Pedals.map(pedal => ({
   name: [pedal.brand, pedal.name].join(' ')
 }))
 
-export const PedalSelect = ({ onSubmit }) => {
+const DEFAULT_VOLTAGE = 9;
+
+export const PedalSelect = ({ onSubmit, voltage }) => {
   const [selectedPedal, selectPedal] = useState();
+
+  const voltagePedals = useMemo(() => mappedPedals.filter(pedal => Array.isArray(pedal.voltage) ? pedal.voltage.some(volts => volts >= voltage) : (pedal.voltage || DEFAULT_VOLTAGE) >= voltage), [voltage]);
 
   function onSubmitInterceptor(event) {
     event.preventDefault();
@@ -25,7 +29,7 @@ export const PedalSelect = ({ onSubmit }) => {
 
   return (<form onSubmit={onSubmitInterceptor}>
     <DatalistSelect
-      items={mappedPedals}
+      items={voltagePedals}
       label="Select a pedal"
       id="power-pedal-choice"
       name="power-pedal-choice"
@@ -34,4 +38,8 @@ export const PedalSelect = ({ onSubmit }) => {
     />
     <button type="submit" disabled={!selectedPedal}>Choose this</button>
   </form>)
+}
+
+PedalSelect.defaultProps = {
+  voltage: 9,
 }
